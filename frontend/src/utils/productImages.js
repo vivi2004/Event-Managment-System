@@ -69,13 +69,13 @@ export const getProductImage = (productName, index = 0) => {
 }
 
 // Get default product image
-export const getDefaultProductImage = (index = 0) => {
+export const getDefaultProductImage = () => {
   const colors = categoryColors.default
   return `https://ui-avatars.com/api/?name=PR&background=${colors.bg}&color=${colors.text}&size=400&font-size=0.5&length=2&rounded=false&bold=true`
 }
 
 // Alternative: Get product image using placehold.co with text
-export const getProductImageWithText = (productName, index = 0) => {
+export const getProductImageWithText = (productName) => {
   if (!productName) {
     const colors = categoryColors.default
     return `https://placehold.co/400x300/${colors.bg}/${colors.text}?text=Product`

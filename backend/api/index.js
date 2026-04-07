@@ -14,13 +14,13 @@
 import express from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
-import connectDB from './config/db.js';
-import { notFound, errorHandler } from './middleware/errorMiddleware.js';
+import connectDB from '../config/db.js';
+import { notFound, errorHandler } from '../middleware/errorMiddleware.js';
 
-import authRoutes from './routes/authRoutes.js';
-import adminRoutes from './routes/adminRoutes.js';
-import vendorRoutes from './routes/vendorRoutes.js';
-import userRoutes from './routes/userRoutes.js';
+import authRoutes from '../routes/authRoutes.js';
+import adminRoutes from '../routes/adminRoutes.js';
+import vendorRoutes from '../routes/vendorRoutes.js';
+import userRoutes from '../routes/userRoutes.js';
 
 // Load env vars
 dotenv.config();
