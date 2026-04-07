@@ -1,4 +1,4 @@
-# 🎉 Event Management System
+#  Event Management System
 
 A comprehensive, full-stack web application for managing events, vendors, and guests. Built with modern technologies and featuring role-based access control for Admins, Vendors, and Users.
 
@@ -7,10 +7,7 @@ A comprehensive, full-stack web application for managing events, vendors, and gu
 ![Node.js](https://img.shields.io/badge/Node.js-18.0+-339933?style=for-the-badge&logo=node.js&logoColor=white)
 ![MongoDB](https://img.shields.io/badge/MongoDB-6.0+-47A248?style=for-the-badge&logo=mongodb&logoColor=white)
 
-## 🚀 Live Demo
 
-- **Frontend:** http://localhost:5175
-- **Backend API:** http://localhost:5001
 
 ## ✨ Features
 
@@ -302,24 +299,6 @@ npm run build
 
 This project is licensed under the MIT License - see the LICENSE file for details.
 
-## 👨‍💻 Author
-
-**Vivek Kumar**
-- 📧 Email: vivekpurbey586@gmail.com
-- 💼 LinkedIn: https://www.linkedin.com/in/vivek-kumar-p-3241a2259/
-- 🐙 GitHub: https://github.com/vivi2004
-- 📸 Instagram: https://www.instagram.com/viui_64/
-
-## 📞 Support
-
-For support, email vivekpurbey586@gmail.com or create an issue in the repository.
-
-## 🙏 Acknowledgments
-
-- Thanks to all contributors who helped build this system
-- Special thanks to the open-source community for the amazing tools and libraries
-
----
 
 <p align="center">
   <strong>⭐ Star this repository if you find it helpful!</strong>
