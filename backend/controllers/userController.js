@@ -46,6 +46,23 @@ const getVendors = asyncHandler(async (req, res) => {
 });
 
 /**
+ * @desc    Get all products (for users to browse)
+ * @route   GET /api/user/products
+ * @access  Private/User
+ */
+const getProducts = asyncHandler(async (req, res) => {
+  const products = await Product.find()
+    .populate('vendorId', 'name email')
+    .sort({ createdAt: -1 });
+
+  res.json({
+    success: true,
+    count: products.length,
+    products,
+  });
+});
+
+/**
  * @desc    Add items to cart (staging for checkout)
  * @route   POST /api/user/cart
  * @access  Private/User
@@ -389,7 +406,8 @@ const getUserProductRequests = asyncHandler(async (req, res) => {
 });
 
 export { 
-  getVendors, 
+  getVendors,
+  getProducts,
   addToCart, 
   createOrder, 
   getOrders, 

@@ -1,6 +1,7 @@
 import express from 'express';
 import { 
-  getVendors, 
+  getVendors,
+  getProducts,
   addToCart, 
   createOrder, 
   getOrders, 
@@ -22,6 +23,7 @@ router.use(protect);
 router.use(authorizeRoles('user'));
 
 router.get('/vendors', getVendors);
+router.get('/products', getProducts);
 router.post('/cart', addToCart);
 router.post('/order', createOrder);
 router.get('/orders', getOrders);
