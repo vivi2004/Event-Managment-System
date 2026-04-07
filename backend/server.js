@@ -26,20 +26,34 @@ import userRoutes from './routes/userRoutes.js';
 dotenv.config();
 
 // Connect to DB
-// We will mock this temporarily if mongoose is not installed yet but since we will npm install, we keep it.
 connectDB();
 
 const app = express();
 
-// Body parser
-app.use(express.json());
-app.use(cors());
+// CORS Configuration
+const corsOptions = {
+  origin: process.env.FRONTEND_URL 
+    ? [process.env.FRONTEND_URL, 'http://localhost:5175', 'http://localhost:3000']
+    : '*',
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+};
 
+// Middleware
+app.use(cors(corsOptions));
+app.use(express.json());
+
+// Health check endpoint
 app.get('/', (req, res) => {
-  res.send('API is running...');
+  res.json({
+    message: 'Event Management System API is running',
+    status: 'online',
+    timestamp: new Date().toISOString()
+  });
 });
 
-// Using routes
+// API Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/vendor', vendorRoutes);
