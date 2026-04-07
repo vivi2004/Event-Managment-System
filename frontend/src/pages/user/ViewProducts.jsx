@@ -3,6 +3,7 @@ import { userAPI } from '../../services/api.js'
 import toast from 'react-hot-toast'
 import { Package, Plus, Minus, ShoppingCart, Star, Heart } from 'lucide-react'
 import BackButton from '../../components/BackButton.jsx'
+import { getProductImage } from '../../utils/productImages.js'
 
 const ViewProducts = () => {
   const [products, setProducts] = useState([])
@@ -82,7 +83,9 @@ const ViewProducts = () => {
       <div className="relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-purple-600/90 via-pink-600/90 to-blue-600/90"></div>
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-          <BackButton className="mb-6" />
+          <div className="absolute top-0 left-0">
+            <BackButton className="mb-6" />
+          </div>
           
           <div className="text-center">
             <div className="flex justify-center mb-6">
@@ -142,7 +145,7 @@ const ViewProducts = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {products.map((product, index) => {
               const cartItem = getCartItem(product._id)
-              const imageUrl = `https://picsum.photos/seed/product-${product.name}-${index}/400/300.jpg`
+              const imageUrl = getProductImage(product.name, index)
               
               return (
                 <div key={product._id} className="group">

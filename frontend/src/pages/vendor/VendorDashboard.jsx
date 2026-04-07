@@ -4,6 +4,7 @@ import { vendorAPI } from '../../services/api.js'
 import toast from 'react-hot-toast'
 import { Store, Package, ShoppingCart, MessageSquare, TrendingUp, Plus, Eye } from 'lucide-react'
 import BackButton from '../../components/BackButton.jsx'
+import { getProductImage, getCakeImage, getFlowerImage } from '../../utils/productImages.js'
 
 const VendorDashboard = () => {
   const [stats, setStats] = useState({
@@ -45,7 +46,7 @@ const VendorDashboard = () => {
       color: 'from-green-500 to-teal-600',
       link: '/vendor/products',
       description: 'Manage your product listings',
-      image: 'https://picsum.photos/seed/vendor-products/400/300.jpg',
+      image: getCakeImage(0),
     },
     {
       title: 'Transactions',
@@ -54,7 +55,7 @@ const VendorDashboard = () => {
       color: 'from-blue-500 to-cyan-600',
       link: '/vendor/transactions',
       description: 'View customer orders',
-      image: 'https://picsum.photos/seed/vendor-transactions/400/300.jpg',
+      image: getFlowerImage(0),
     },
     {
       title: 'Product Requests',
@@ -63,7 +64,7 @@ const VendorDashboard = () => {
       color: 'from-purple-500 to-pink-600',
       link: '/vendor/product-requests',
       description: 'Customer inquiries',
-      image: 'https://picsum.photos/seed/vendor-requests/400/300.jpg',
+      image: getProductImage('request', 0),
     },
   ]
 
@@ -94,7 +95,9 @@ const VendorDashboard = () => {
       <div className="relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-emerald-600/90 via-teal-600/90 to-cyan-600/90"></div>
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-          <BackButton className="mb-6" />
+          <div className="absolute top-0 left-0">
+            <BackButton className="mb-6" />
+          </div>
           
           <div className="text-center">
             <div className="flex justify-center mb-6">
