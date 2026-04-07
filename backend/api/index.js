@@ -22,18 +22,29 @@ import adminRoutes from '../routes/adminRoutes.js';
 import vendorRoutes from '../routes/vendorRoutes.js';
 import userRoutes from '../routes/userRoutes.js';
 
+const app = express();
+
 // Load env vars
 dotenv.config();
 
-// Connect to DB
-// We will mock this temporarily if mongoose is not installed yet but since we will npm install, we keep it.
-connectDB();
-
-const app = express();
-
-// Body parser
-app.use(express.json());
+// Body parser and CORS (FIRST in stack)
 app.use(cors());
+app.use(express.json());
+
+// Middleware to ensure DB is connected before any request
+app.use(async (req, res, next) => {
+  try {
+    // If it's an OPTIONS request, just pass it to CORS
+    if (req.method === 'OPTIONS') {
+      return next();
+    }
+    await connectDB();
+    next();
+  } catch (err) {
+    console.error('Database pre-request connection error:', err);
+    res.status(500).json({ message: 'Database connection failed' });
+  }
+});
 
 app.get('/', (req, res) => {
   res.send('API is running...');

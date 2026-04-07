@@ -3,45 +3,33 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext.jsx'
 import { authAPI } from '../../services/api.js'
 import toast from 'react-hot-toast'
-import { User, Eye, EyeOff } from 'lucide-react'
-import BackButton from '../../components/BackButton.jsx'
+import { UserPlus, Mail, Lock, User, CheckCircle2 } from 'lucide-react'
 
 const UserSignup = () => {
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
-  const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
   const { login } = useAuth()
   const navigate = useNavigate()
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-
     if (!name || !email || !password) {
-      toast.error('Please fill in all fields')
+      toast.error('All fields required')
       return
     }
-
-    if (password.length < 6) {
-      toast.error('Password must be at least 6 characters')
-      return
-    }
-
     if (password !== confirmPassword) {
-      toast.error('Passwords do not match')
+      toast.error('Passwords mismatch')
       return
     }
 
     setLoading(true)
-
     try {
       const response = await authAPI.userSignup(name, email, password)
-      const { data } = response
-
-      login(data, data.token)
-      toast.success('Account created successfully!')
+      login(response.data, response.data.token)
+      toast.success('Account created')
       navigate('/user/portal')
     } catch (error) {
       toast.error(error.response?.data?.message || 'Signup failed')
@@ -51,107 +39,95 @@ const UserSignup = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 flex items-center justify-center p-4">
-      <div className="absolute top-4 left-4">
-        <BackButton />
-      </div>
-      <div className="card w-full max-w-md">
-        <div className="text-center mb-6">
-          <div className="flex items-center justify-center w-16 h-16 bg-purple-100 rounded-full mb-4 mx-auto">
-            <User className="w-8 h-8 text-purple-600" />
-          </div>
-          <h1 className="text-2xl font-bold">User Signup</h1>
-          <p className="text-gray-600 mt-2">Create your account</p>
+    <div className="page-container max-w-md">
+      <header className="mb-10 text-center">
+        <div className="inline-flex p-3 bg-blue-50 text-blue-600 rounded-2xl mb-4">
+          <UserPlus className="w-8 h-8" />
         </div>
+        <h1 className="text-3xl font-black text-slate-900 tracking-tight uppercase">User Registration</h1>
+        <p className="text-sm text-slate-500 font-medium uppercase tracking-widest mt-1">Initialize Personal Session Profile</p>
+      </header>
 
+      <div className="card shadow-xl border-slate-100">
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="form-group">
-            <label htmlFor="name" className="form-label">Full Name</label>
+            <label className="form-label flex items-center gap-2 text-blue-600">
+              <User className="w-3 h-3" /> Full Identity Name
+            </label>
             <input
               type="text"
-              id="name"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="input"
-              placeholder="John Doe"
+              className="input pl-4 border-slate-100 placeholder:lowercase"
+              placeholder="Full Name"
               required
             />
           </div>
 
           <div className="form-group">
-            <label htmlFor="email" className="form-label">Email Address</label>
+            <label className="form-label flex items-center gap-2 text-blue-600">
+              <Mail className="w-3 h-3" /> Email Designation
+            </label>
             <input
               type="email"
-              id="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="input"
-              placeholder="user@example.com"
+              className="input pl-4 border-slate-100 placeholder:lowercase"
+              placeholder="name@example.com"
               required
             />
           </div>
 
-          <div className="form-group">
-            <label htmlFor="password" className="form-label">Password</label>
-            <div className="relative">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="form-group">
+              <label className="form-label flex items-center gap-2 text-blue-600">
+                <Lock className="w-3 h-3" /> Password
+              </label>
               <input
-                type={showPassword ? 'text' : 'password'}
-                id="password"
+                type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="input pr-10"
+                className="input pl-4 border-slate-100"
                 placeholder="••••••••"
                 required
-                minLength={6}
               />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
-              >
-                {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-              </button>
             </div>
-            <p className="text-xs text-gray-500 mt-1">Must be at least 6 characters</p>
+
+            <div className="form-group">
+              <label className="form-label flex items-center gap-2 text-blue-600">
+                <Lock className="w-3 h-3" /> Confirm
+              </label>
+              <input
+                type="password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                className="input pl-4 border-slate-100"
+                placeholder="••••••••"
+                required
+              />
+            </div>
           </div>
 
-          <div className="form-group">
-            <label htmlFor="confirmPassword" className="form-label">Confirm Password</label>
-            <input
-              type="password"
-              id="confirmPassword"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              className="input"
-              placeholder="••••••••"
-              required
-            />
-          </div>
-
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full px-4 py-2 rounded-lg font-medium bg-purple-600 text-white hover:bg-purple-700 transition-colors disabled:opacity-50"
+          <button 
+            type="submit" 
+            disabled={loading} 
+            className="btn-primary w-full py-4 mt-4 flex items-center justify-center gap-2 text-xs font-black uppercase tracking-[0.2em]"
           >
-            {loading ? 'Creating Account...' : 'Create Account'}
+            {loading ? 'CREATING...' : (
+              <>
+                <CheckCircle2 className="w-4 h-4" /> Create Account
+              </>
+            )}
           </button>
         </form>
 
-        <div className="mt-6 text-center">
-          <p className="text-gray-600">
-            Already have an account?{' '}
-            <Link to="/user/login" className="text-purple-600 hover:text-purple-700 font-medium">
-              Login
-            </Link>
+        <div className="mt-8 pt-8 border-t border-slate-50 text-center">
+          <p className="text-xs text-slate-500 font-bold uppercase tracking-tight">
+            Already have an account? <Link to="/user/login" className="text-blue-600 hover:underline">Login here</Link>
           </p>
         </div>
-
-        <div className="mt-4 pt-4 border-t text-center">
-          <Link to="/" className="text-gray-500 hover:text-gray-700 text-sm">
-            ← Back to Home
-          </Link>
-        </div>
       </div>
+
     </div>
   )
 }

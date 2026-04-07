@@ -1,7 +1,7 @@
-import { ArrowLeft } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
+import { ArrowLeft } from 'lucide-react'
 
-const BackButton = ({ to = -1, className = '' }) => {
+const BackButton = ({ to = -1, className = '', children = 'Back' }) => {
   const navigate = useNavigate()
 
   const handleBack = () => {
@@ -15,10 +15,10 @@ const BackButton = ({ to = -1, className = '' }) => {
   return (
     <button
       onClick={handleBack}
-      className={`inline-flex items-center space-x-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 px-4 py-2 rounded-lg transition-all duration-200 shadow-sm hover:shadow-md ${className}`}
+      className={`inline-flex items-center gap-2 px-3 py-1.5 text-[10px] font-bold text-slate-500 uppercase tracking-widest border border-slate-200 rounded-lg hover:bg-white hover:text-slate-900 hover:border-slate-300 hover:shadow-sm transition-all active:scale-95 ${className}`}
     >
-      <ArrowLeft className="w-4 h-4" />
-      <span className="text-sm font-medium">Back</span>
+      <ArrowLeft className="w-3 h-3" />
+      {children}
     </button>
   )
 }

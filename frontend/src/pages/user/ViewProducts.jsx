@@ -1,14 +1,25 @@
 import { useEffect, useState } from 'react'
 import { userAPI } from '../../services/api.js'
 import toast from 'react-hot-toast'
-import { Package, Plus, Minus, ShoppingCart, Star, Heart } from 'lucide-react'
 import BackButton from '../../components/BackButton.jsx'
-import { getProductImage } from '../../utils/productImages.js'
+import { useNavigate } from 'react-router-dom'
+import { 
+  ShoppingCart, 
+  Package, 
+  Plus, 
+  Minus, 
+  Store, 
+  Activity, 
+  Search, 
+  Box,
+  ChevronRight
+} from 'lucide-react'
 
 const ViewProducts = () => {
   const [products, setProducts] = useState([])
   const [cart, setCart] = useState([])
   const [loading, setLoading] = useState(true)
+  const navigate = useNavigate()
 
   useEffect(() => {
     fetchProducts()
@@ -19,11 +30,12 @@ const ViewProducts = () => {
   }, [])
 
   const fetchProducts = async () => {
+    setLoading(true)
     try {
       const response = await userAPI.getProducts()
       setProducts(response.data.products || [])
     } catch (error) {
-      toast.error('Failed to load products')
+      toast.error('Data sync failed')
     } finally {
       setLoading(false)
     }
@@ -45,13 +57,7 @@ const ViewProducts = () => {
     
     setCart(newCart)
     localStorage.setItem('cart', JSON.stringify(newCart))
-    toast.success(`${product.name} added to cart`)
-  }
-
-  const removeFromCart = (productId) => {
-    const newCart = cart.filter(item => item.productId !== productId)
-    setCart(newCart)
-    localStorage.setItem('cart', JSON.stringify(newCart))
+    toast.success('Added to Cart')
   }
 
   const updateQuantity = (productId, delta) => {
@@ -69,202 +75,122 @@ const ViewProducts = () => {
 
   const getCartItem = (productId) => cart.find(item => item.productId === productId)
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div>
-      </div>
-    )
-  }
+  const cartTotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0)
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50">
-      {/* Header Section */}
-      <div className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-purple-600/90 via-pink-600/90 to-blue-600/90"></div>
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-          <div className="absolute top-0 left-0">
-            <BackButton className="mb-6" />
-          </div>
-          
-          <div className="text-center">
-            <div className="flex justify-center mb-6">
-              <div className="p-3 bg-white/20 backdrop-blur-sm rounded-2xl">
-                <Package className="w-8 h-8 text-white" />
-              </div>
-            </div>
-            <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
-              Browse Products
-            </h1>
-            <p className="text-xl text-purple-100 max-w-2xl mx-auto">
-              Discover amazing products from our trusted vendors
-            </p>
-          </div>
-        </div>
-        
-        {/* Decorative Elements */}
-        <div className="absolute bottom-0 left-0 right-0">
-          <svg className="w-full h-16 text-purple-50" fill="currentColor" viewBox="0 0 1440 100">
-            <path d="M0,64L48,69.3C96,75,192,85,288,80C384,75,480,53,576,48C672,43,768,53,864,58.7C960,64,1056,64,1152,58.7C1248,53,1344,43,1392,37.3L1440,32L1440,100L1392,100C1344,100,1248,100,1152,100C1056,100,960,100,864,100C768,100,672,100,576,100C480,100,384,100,288,100C192,100,96,100,48,100L0,100Z"></path>
-          </svg>
-        </div>
+    <div className="page-container">
+      <div className="mb-8 flex justify-between items-center">
+        <BackButton />
+        {cart.length > 0 && (
+          <button 
+            onClick={() => navigate('/user/cart')}
+            className="btn-primary px-6 py-2.5 text-xs font-black uppercase tracking-[0.15em] flex items-center gap-3 shadow-lg shadow-slate-900/20 active:scale-95 transition-all"
+          >
+            <ShoppingCart className="w-4 h-4" /> 
+            View Cart (${cartTotal.toFixed(2)})
+          </button>
+        )}
       </div>
 
-      {/* Cart Summary */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="bg-white rounded-2xl shadow-xl p-6 mb-8">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <ShoppingCart className="w-8 h-8 text-purple-600" />
-              <div>
-                <h2 className="text-xl font-bold text-gray-900">Shopping Cart</h2>
-                <p className="text-gray-600">{cart.length} items in cart</p>
-              </div>
-            </div>
-            <div className="text-right">
-              <p className="text-sm text-gray-500">Total</p>
-              <p className="text-2xl font-bold text-green-600">
-                ${cart.reduce((sum, item) => sum + (item.price * item.quantity), 0).toFixed(2)}
-              </p>
-            </div>
-          </div>
-          {cart.length > 0 && (
-            <div className="mt-4 flex justify-end">
-              <button
-                onClick={() => window.location.href = '/user/checkout'}
-                className="px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg font-semibold hover:from-purple-700 hover:to-pink-700 transition-all duration-200"
-              >
-                Proceed to Checkout
-              </button>
-            </div>
-          )}
+      <header className="page-header flex items-center gap-4">
+        <div className="p-3 bg-blue-50 text-blue-600 rounded-xl">
+           <Package className="w-6 h-6" />
         </div>
+        <div>
+          <h1 className="page-title">Global Catalog</h1>
+          <p className="page-subtitle uppercase tracking-widest text-[10px] font-bold text-slate-400">Available event solutions and equipment</p>
+        </div>
+      </header>
 
-        {/* Products Grid */}
-        {products.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {products.map((product, index) => {
-              const cartItem = getCartItem(product._id)
-              const imageUrl = getProductImage(product.name, index)
-              
-              return (
-                <div key={product._id} className="group">
-                  <div className="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden">
-                    {/* Product Image */}
-                    <div className="relative overflow-hidden">
-                      <img 
-                        src={imageUrl} 
-                        alt={product.name}
-                        className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
-                      />
-                      <div className="absolute top-4 right-4">
-                        <button className="p-2 bg-white/90 backdrop-blur-sm rounded-full hover:bg-white transition-colors">
-                          <Heart className="w-4 h-4 text-gray-600 hover:text-red-500" />
-                        </button>
-                      </div>
-                      <div className="absolute top-4 left-4">
-                        <span className="px-3 py-1 bg-green-500 text-white text-xs font-semibold rounded-full">
-                          In Stock
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* Product Info */}
-                    <div className="p-6">
-                      <div className="flex items-start justify-between mb-2">
-                        <h3 className="text-lg font-bold text-gray-900 group-hover:text-purple-600 transition-colors">
-                          {product.name}
-                        </h3>
-                        <div className="flex items-center space-x-1">
-                          {[...Array(5)].map((_, i) => (
-                            <Star key={i} className={`w-4 h-4 ${i < 4 ? 'text-yellow-400 fill-current' : 'text-gray-300'}`} />
-                          ))}
-                        </div>
-                      </div>
-                      
-                      <p className="text-gray-600 text-sm mb-4 line-clamp-2">
-                        {product.description}
-                      </p>
-
-                      <div className="flex items-center justify-between mb-4">
-                        <div>
-                          <p className="text-2xl font-bold text-green-600">${product.price}</p>
-                          <p className="text-xs text-gray-500">per item</p>
-                        </div>
-                        <div className="text-right">
-                          <p className="text-xs text-gray-500">Vendor</p>
-                          <p className="text-sm font-medium text-gray-700">
-                            {product.vendorId?.name || 'Unknown'}
-                          </p>
-                        </div>
-                      </div>
-
-                      {/* Cart Actions */}
-                      {cartItem ? (
-                        <div className="flex items-center justify-between p-3 bg-purple-50 rounded-lg">
-                          <div className="flex items-center space-x-2">
-                            <button
-                              onClick={() => updateQuantity(product._id, -1)}
-                              className="w-8 h-8 rounded-full bg-white flex items-center justify-center hover:bg-gray-100 transition-colors shadow-sm"
-                            >
-                              <Minus className="w-4 h-4 text-gray-600" />
-                            </button>
-                            <span className="font-bold text-gray-900 w-8 text-center">
-                              {cartItem.quantity}
-                            </span>
-                            <button
-                              onClick={() => updateQuantity(product._id, 1)}
-                              className="w-8 h-8 rounded-full bg-white flex items-center justify-center hover:bg-gray-100 transition-colors shadow-sm"
-                            >
-                              <Plus className="w-4 h-4 text-gray-600" />
-                            </button>
-                          </div>
-                          <div className="flex items-center space-x-2">
-                            <span className="text-sm font-semibold text-gray-700">
-                              ${(product.price * cartItem.quantity).toFixed(2)}
-                            </span>
-                            <button
-                              onClick={() => removeFromCart(product._id)}
-                              className="text-red-500 hover:text-red-700 transition-colors"
-                            >
-                              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                              </svg>
-                            </button>
-                          </div>
-                        </div>
-                      ) : (
-                        <button
-                          onClick={() => addToCart(product)}
-                          className="w-full py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg font-semibold hover:from-purple-700 hover:to-pink-700 transition-all duration-200 flex items-center justify-center space-x-2 group"
-                        >
-                          <ShoppingCart className="w-5 h-5 group-hover:scale-110 transition-transform" />
-                          <span>Add to Cart</span>
-                        </button>
-                      )}
+      {loading ? (
+        <div className="p-20 text-center flex flex-col items-center gap-4">
+          <Activity className="w-8 h-8 text-blue-500 animate-pulse" />
+          <div className="text-[10px] font-mono font-bold text-slate-400 uppercase tracking-widest">Loading Catalog...</div>
+        </div>
+      ) : products.length > 0 ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {products.map((product) => {
+            const cartItem = getCartItem(product._id)
+            
+            return (
+              <div key={product._id} className="card group flex flex-col border-slate-100 hover:border-blue-200 hover:shadow-xl hover:shadow-blue-900/5 transition-all">
+                <div className="mb-6">
+                  <div className="flex justify-between items-start mb-3">
+                    <h3 className="text-sm font-black text-slate-900 uppercase tracking-tight group-hover:text-blue-600 transition-colors">
+                      {product.name}
+                    </h3>
+                    <div className="px-2 py-1 rounded bg-emerald-50 text-emerald-700 font-mono text-xs font-black border border-emerald-100">
+                      ${product.price.toFixed(2)}
                     </div>
                   </div>
+                  <p className="text-[11px] text-slate-500 font-medium leading-relaxed uppercase tracking-tight line-clamp-3 mb-4">
+                    {product.description}
+                  </p>
+                  <div className="flex items-center gap-2 text-[9px] font-black text-slate-400 uppercase tracking-[0.1em] border-t border-slate-50 pt-3">
+                    <Store className="w-3 h-3" />
+                    <span>{product.vendorId?.name || 'Vendor'}</span>
+                  </div>
                 </div>
-              )
-            })}
+
+                <div className="mt-auto pt-4">
+                  {cartItem ? (
+                    <div className="flex items-center justify-between bg-slate-50 p-2 rounded-xl border border-slate-100">
+                      <div className="flex items-center gap-3">
+                        <button 
+                          onClick={() => updateQuantity(product._id, -1)} 
+                          className="w-8 h-8 bg-white border border-slate-200 rounded-lg flex items-center justify-center text-slate-600 hover:text-red-600 hover:border-red-200 transition-all shadow-sm active:scale-95"
+                        >
+                          <Minus className="w-3 h-3" />
+                        </button>
+                        <span className="text-xs font-mono font-black w-6 text-center text-slate-900">
+                          {cartItem.quantity}
+                        </span>
+                        <button 
+                          onClick={() => updateQuantity(product._id, 1)} 
+                          className="w-8 h-8 bg-white border border-slate-200 rounded-lg flex items-center justify-center text-slate-600 hover:text-emerald-600 hover:border-emerald-200 transition-all shadow-sm active:scale-95"
+                        >
+                          <Plus className="w-3 h-3" />
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={() => addToCart(product)}
+                      className="w-full btn-secondary py-3 flex items-center justify-center gap-2 group-hover:bg-blue-600 group-hover:text-white group-hover:border-blue-600 transition-all text-[10px] font-black uppercase tracking-widest"
+                    >
+                      <Plus className="w-3.5 h-3.5" /> Add to Cart
+                    </button>
+                  )}
+                </div>
+              </div>
+            )
+          })}
+        </div>
+      ) : (
+        <div className="p-20 text-center border-4 border-dashed border-slate-100 rounded-3xl flex flex-col items-center gap-4">
+          <Search className="w-12 h-12 text-slate-200" />
+          <div className="text-sm font-black text-slate-300 uppercase tracking-widest">
+            Catalog is Empty
           </div>
-        ) : (
-          <div className="text-center py-16">
-            <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
-              <Package className="w-12 h-12 text-gray-400" />
-            </div>
-            <h3 className="text-2xl font-bold text-gray-900 mb-4">No products available</h3>
-            <p className="text-gray-600 mb-8 max-w-md mx-auto">
-              Check back later for new products from our vendors
-            </p>
-            <button
-              onClick={() => window.location.href = '/user/vendors'}
-              className="px-8 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg font-semibold hover:from-purple-700 hover:to-pink-700 transition-all duration-200"
-            >
-              Browse Vendors
-            </button>
-          </div>
-        )}
+        </div>
+      )}
+      
+      <div className="mt-16 bg-slate-900 text-white rounded-2xl p-6 shadow-2xl shadow-slate-900/30 font-mono text-[10px] uppercase flex flex-col md:flex-row justify-between items-center gap-4 relative overflow-hidden">
+        <div className="flex items-center gap-3 relative z-10">
+          <Activity className="w-4 h-4 text-emerald-400" />
+          <span className="font-bold tracking-widest uppercase">Cart Status: {cart.length > 0 ? 'Active' : 'Empty'}</span>
+        </div>
+        <div className="flex items-center gap-6 relative z-10">
+           <span className="text-slate-500">Total Valuation:</span>
+           <span className="text-xl font-black text-white">${cartTotal.toFixed(2)}</span>
+           <button 
+             onClick={() => navigate('/user/cart')}
+             className="p-2 bg-white/10 rounded-lg hover:bg-white/20 transition-all"
+           >
+             <ChevronRight className="w-4 h-4" />
+           </button>
+        </div>
+        <Box className="absolute -left-10 -bottom-10 w-48 h-48 text-white/[0.03] -rotate-12" />
       </div>
     </div>
   )

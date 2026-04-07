@@ -1,7 +1,6 @@
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { useAuth } from './context/AuthContext.jsx'
 import Navbar from './components/Navbar.jsx'
-import Footer from './components/Footer.jsx'
 
 // Auth Pages
 import Index from './pages/Index.jsx'
@@ -239,7 +238,6 @@ function App() {
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </main>
-      <Footer />
     </div>
   )
 }

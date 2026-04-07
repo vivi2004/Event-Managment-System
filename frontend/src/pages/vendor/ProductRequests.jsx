@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 import { vendorAPI } from '../../services/api.js'
 import toast from 'react-hot-toast'
-import { ShoppingCart, User, Check, X, MessageSquare } from 'lucide-react'
 import BackButton from '../../components/BackButton.jsx'
 
 const ProductRequests = () => {
@@ -19,7 +18,7 @@ const ProductRequests = () => {
       const response = await vendorAPI.getProductRequests()
       setRequests(response.data.requests || [])
     } catch (error) {
-      toast.error('Failed to load product requests')
+      toast.error('Sync failed')
     } finally {
       setLoading(false)
     }
@@ -31,168 +30,122 @@ const ProductRequests = () => {
         status,
         responseMessage: responseMessage,
       })
-      toast.success(`Request ${status} successfully`)
+      toast.success(`Action: ${status.toUpperCase()} - Success`)
       setResponseMessage('')
       setSelectedRequest(null)
       fetchRequests()
     } catch (error) {
-      toast.error('Failed to respond to request')
+      toast.error('Operation failed')
     }
   }
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600"></div>
-      </div>
-    )
-  }
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-50">
-      {/* Header Section */}
-      <div className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-emerald-600/90 via-teal-600/90 to-cyan-600/90"></div>
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-          <div className="absolute top-0 left-0">
-            <BackButton className="mb-6" />
-          </div>
-          
-          <div className="text-center">
-            <div className="flex justify-center mb-6">
-              <div className="p-3 bg-white/20 backdrop-blur-sm rounded-2xl">
-                <ShoppingCart className="w-8 h-8 text-white" />
-              </div>
-            </div>
-            <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
-              Product Requests
-            </h1>
-            <p className="text-xl text-white/90 max-w-2xl mx-auto">
-              Manage customer product requests
-            </p>
-          </div>
-        </div>
-        
-        {/* Decorative Elements */}
-        <div className="absolute bottom-0 left-0 right-0">
-          <svg className="w-full h-16 text-emerald-50" fill="currentColor" viewBox="0 0 1440 100">
-            <path d="M0,64L48,69.3C96,75,192,85,288,80C384,75,480,53,576,48C672,43,768,53,864,58.7C960,64,1056,64,1152,58.7C1248,53,1344,43,1392,37.3L1440,32L1440,100L1392,100C1344,100,1248,100,1152,100C1056,100,960,100,864,100C768,100,672,100,576,100C480,100,384,100,288,100C192,100,96,100,48,100L0,100Z"></path>
-          </svg>
-        </div>
+    <div className="page-container">
+      <div className="mb-6">
+        <BackButton />
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        {requests.length > 0 ? (
-          <div className="space-y-6">
-            {requests.map((request) => (
-              <div key={request._id} className="bg-white rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 p-8">
-                <div className="flex items-center justify-between mb-6">
-                  <div className="flex items-center space-x-3">
-                    <div className="w-12 h-12 bg-emerald-100 rounded-xl flex items-center justify-center">
-                      <User className="w-6 h-6 text-emerald-600" />
-                    </div>
-                    <div>
-                      <h3 className="text-lg font-bold text-gray-900">{request.userId?.name || 'Unknown'}</h3>
-                      <p className="text-gray-500">{request.userId?.email || 'N/A'}</p>
-                    </div>
-                  </div>
-                  <span className={`px-4 py-2 rounded-full text-sm font-medium ${
-                    request.status === 'approved' ? 'bg-green-100 text-green-800' :
-                    request.status === 'rejected' ? 'bg-red-100 text-red-800' :
-                    request.status === 'completed' ? 'bg-blue-100 text-blue-800' :
-                    'bg-yellow-100 text-yellow-800'
+      <header className="page-header">
+        <h1 className="page-title">USER REQUESTS</h1>
+        <p className="page-subtitle">Inbound inquiries and custom orders from users</p>
+      </header>
+
+      {loading ? (
+        <div className="p-8 text-center text-xs font-mono text-slate-400">QUERYING_REQUEST_BUFFER...</div>
+      ) : requests.length > 0 ? (
+        <div className="space-y-4">
+          {requests.map((request) => (
+            <div key={request._id} className="card border-l-4 border-l-slate-900">
+              <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-4 pb-4 border-b border-slate-100">
+                <div>
+                  <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Requester Information</div>
+                  <h3 className="text-sm font-bold text-slate-900">{request.userId?.name || 'ANONYMOUS_USER'}</h3>
+                  <p className="text-xs font-mono text-slate-500">{request.userId?.email || 'SYSTEM_INTERNAL'}</p>
+                </div>
+                <div className="text-right">
+                  <span className={`text-[10px] font-bold px-2 py-1 border rounded uppercase tracking-tighter ${
+                    request.status === 'approved' ? 'border-emerald-200 text-emerald-600 bg-emerald-50' :
+                    request.status === 'rejected' ? 'border-red-200 text-red-600 bg-red-50' :
+                    'border-amber-200 text-amber-600 bg-amber-50'
                   }`}>
-                    {request.status}
+                    STATUS: {request.status}
                   </span>
                 </div>
-
-                <div className="bg-gradient-to-r from-emerald-50 to-teal-50 p-6 rounded-xl mb-6">
-                  <h3 className="text-xl font-bold text-gray-900 mb-2">{request.productName}</h3>
-                  <p className="text-gray-600 mb-4">{request.description}</p>
-                  <div className="flex items-center space-x-8 text-sm">
-                    <div className="flex items-center space-x-2">
-                      <span className="text-gray-500">Expected Price:</span>
-                      <span className="font-bold text-emerald-600">${request.expectedPrice}</span>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <span className="text-gray-500">Quantity:</span>
-                      <span className="font-bold text-emerald-600">{request.quantity}</span>
-                    </div>
-                  </div>
-                </div>
-
-                {request.responseMessage && (
-                  <div className="mb-6 p-4 bg-blue-50 rounded-xl">
-                    <p className="text-sm text-blue-800">
-                      <strong>Your Response:</strong> {request.responseMessage}
-                    </p>
-                  </div>
-                )}
-
-                {request.status === 'pending' && (
-                  <div className="space-y-4">
-                    {selectedRequest === request._id ? (
-                      <>
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center space-x-2">
-                            <MessageSquare className="w-4 h-4" />
-                            <span>Response Message (Optional)</span>
-                          </label>
-                          <textarea
-                            value={responseMessage}
-                            onChange={(e) => setResponseMessage(e.target.value)}
-                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors h-20 resize-none"
-                            placeholder="Enter your response message..."
-                          />
-                        </div>
-                        <div className="flex space-x-3">
-                          <button
-                            onClick={() => setSelectedRequest(null)}
-                            className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium"
-                          >
-                            Cancel
-                          </button>
-                          <button
-                            onClick={() => handleRespond(request._id, 'approved')}
-                            className="flex-1 px-6 py-3 bg-gradient-to-r from-emerald-600 to-teal-600 text-white rounded-lg hover:from-emerald-700 hover:to-teal-700 transition-all duration-200 font-medium flex items-center justify-center space-x-2"
-                          >
-                            <Check className="w-4 h-4" />
-                            <span>Approve</span>
-                          </button>
-                          <button
-                            onClick={() => handleRespond(request._id, 'rejected')}
-                            className="flex-1 px-6 py-3 bg-gradient-to-r from-red-600 to-pink-600 text-white rounded-lg hover:from-red-700 hover:to-pink-700 transition-all duration-200 font-medium flex items-center justify-center space-x-2"
-                          >
-                            <X className="w-4 h-4" />
-                            <span>Reject</span>
-                          </button>
-                        </div>
-                      </>
-                    ) : (
-                      <button
-                        onClick={() => setSelectedRequest(request._id)}
-                        className="w-full px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg hover:from-purple-700 hover:to-pink-700 transition-all duration-200 font-medium"
-                      >
-                        Respond to Request
-                      </button>
-                    )}
-                  </div>
-                )}
-
-                <p className="text-xs text-gray-400 mt-6">
-                  Requested on: {new Date(request.createdAt).toLocaleDateString()}
-                </p>
               </div>
-            ))}
-          </div>
-        ) : (
-          <div className="bg-white rounded-2xl shadow-xl p-12 text-center">
-            <ShoppingCart className="w-16 h-16 mx-auto text-gray-300 mb-4" />
-            <h3 className="text-xl font-bold text-gray-900 mb-2">No product requests</h3>
-            <p className="text-gray-500">Customer requests will appear here</p>
-          </div>
-        )}
-      </div>
+
+              <div className="bg-slate-50 p-4 rounded mb-4">
+                <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Item Specification</div>
+                <h4 className="text-sm font-bold mb-1 uppercase tracking-tight">{request.productName}</h4>
+                <p className="text-xs text-slate-600 leading-relaxed mb-4">{request.description}</p>
+                <div className="flex gap-6 text-[10px] font-mono">
+                  <span className="bg-white px-2 py-1 border border-slate-200 rounded">VALUATION: ${request.expectedPrice}</span>
+                  <span className="bg-white px-2 py-1 border border-slate-200 rounded">QUANTITY: {request.quantity}</span>
+                </div>
+              </div>
+
+              {request.responseMessage && (
+                <div className="mb-4 p-3 bg-slate-900 text-white rounded text-[10px] font-mono">
+                  <span className="text-slate-400 font-bold mr-2">OUTBOUND_RESPONSE:</span>
+                  {request.responseMessage}
+                </div>
+              )}
+
+              {request.status === 'pending' && (
+                <div className="mt-4 pt-4 border-t border-slate-100">
+                  {selectedRequest === request._id ? (
+                    <div className="space-y-4">
+                      <div className="form-group">
+                        <label className="form-label">RESPONSE_MESSAGE (STR)</label>
+                        <textarea
+                          value={responseMessage}
+                          onChange={(e) => setResponseMessage(e.target.value)}
+                          className="input h-20 resize-none text-xs"
+                          placeholder="Type response for the user..."
+                        />
+                      </div>
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => handleRespond(request._id, 'approved')}
+                          className="flex-1 btn-primary py-2 text-[10px] font-bold uppercase tracking-widest"
+                        >
+                          Commit_Approval
+                        </button>
+                        <button
+                          onClick={() => handleRespond(request._id, 'rejected')}
+                          className="flex-1 bg-red-600 text-white rounded py-2 text-[10px] font-bold uppercase tracking-widest"
+                        >
+                          Reject_Entry
+                        </button>
+                        <button
+                          onClick={() => setSelectedRequest(null)}
+                          className="px-4 btn-secondary py-2 text-[10px] font-bold uppercase tracking-widest"
+                        >
+                          Abort
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={() => setSelectedRequest(request._id)}
+                      className="w-full btn-secondary py-2 text-[10px] font-bold uppercase tracking-widest"
+                    >
+                      Process_Request_Buffer
+                    </button>
+                  )}
+                </div>
+              )}
+
+              <div className="mt-4 text-[10px] font-mono text-slate-300">
+                TIMESTAMP: {new Date(request.createdAt).toISOString()}
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="p-12 text-center text-xs text-slate-400 uppercase tracking-widest border-2 border-dashed border-slate-100 rounded">
+          Status: No pending user inquiries in the buffer.
+        </div>
+      )}
     </div>
   )
 }

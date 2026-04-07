@@ -1,6 +1,7 @@
 import asyncHandler from 'express-async-handler';
 import User from '../models/User.js';
 import jwt from 'jsonwebtoken';
+import mongoose from 'mongoose';
 
 /**
  * Generate JWT Token
@@ -26,12 +27,21 @@ const formatUserResponse = (user) => ({
   token: generateToken(user._id),
 });
 
+const ensureDatabaseReady = () => {
+  if (mongoose.connection.readyState !== 1) {
+    const err = new Error('Database not connected. Please try again in a moment.');
+    err.statusCode = 503;
+    throw err;
+  }
+};
+
 /**
  * @desc    Authenticate user & get token (Universal)
  * @route   POST /api/auth/login
  * @access  Public
  */
 const authUser = asyncHandler(async (req, res) => {
+  ensureDatabaseReady();
   const { email, password } = req.body;
 
   if (!email || !password) {
@@ -44,6 +54,7 @@ const authUser = asyncHandler(async (req, res) => {
   if (user && (await user.matchPassword(password))) {
     res.json(formatUserResponse(user));
   } else {
+    console.log(`Login failure for ${email}`);
     res.status(401);
     throw new Error('Invalid email or password');
   }
@@ -55,6 +66,7 @@ const authUser = asyncHandler(async (req, res) => {
  * @access  Public
  */
 const authAdmin = asyncHandler(async (req, res) => {
+  ensureDatabaseReady();
   const { email, password } = req.body;
 
   if (!email || !password) {
@@ -67,6 +79,7 @@ const authAdmin = asyncHandler(async (req, res) => {
   if (user && user.role === 'admin' && (await user.matchPassword(password))) {
     res.json(formatUserResponse(user));
   } else {
+    console.log(`Admin login failure for ${email}`);
     res.status(401);
     throw new Error('Invalid admin credentials');
   }
@@ -78,6 +91,7 @@ const authAdmin = asyncHandler(async (req, res) => {
  * @access  Public
  */
 const authVendor = asyncHandler(async (req, res) => {
+  ensureDatabaseReady();
   const { email, password } = req.body;
 
   if (!email || !password) {
@@ -90,6 +104,7 @@ const authVendor = asyncHandler(async (req, res) => {
   if (user && user.role === 'vendor' && (await user.matchPassword(password))) {
     res.json(formatUserResponse(user));
   } else {
+    console.log(`Vendor login failure for ${email}`);
     res.status(401);
     throw new Error('Invalid vendor credentials');
   }
@@ -101,6 +116,7 @@ const authVendor = asyncHandler(async (req, res) => {
  * @access  Public
  */
 const authUserOnly = asyncHandler(async (req, res) => {
+  ensureDatabaseReady();
   const { email, password } = req.body;
 
   if (!email || !password) {
@@ -113,6 +129,7 @@ const authUserOnly = asyncHandler(async (req, res) => {
   if (user && user.role === 'user' && (await user.matchPassword(password))) {
     res.json(formatUserResponse(user));
   } else {
+    console.log(`User login failure for ${email}`);
     res.status(401);
     throw new Error('Invalid user credentials');
   }
@@ -124,6 +141,7 @@ const authUserOnly = asyncHandler(async (req, res) => {
  * @access  Public
  */
 const registerUser = asyncHandler(async (req, res) => {
+  ensureDatabaseReady();
   const { name, email, password, role } = req.body;
 
   // Input validation
@@ -170,6 +188,7 @@ const registerUser = asyncHandler(async (req, res) => {
  * @access  Public
  */
 const registerAdmin = asyncHandler(async (req, res) => {
+  ensureDatabaseReady();
   const { name, email, password } = req.body;
 
   // Input validation
@@ -211,6 +230,7 @@ const registerAdmin = asyncHandler(async (req, res) => {
  * @access  Public
  */
 const registerVendor = asyncHandler(async (req, res) => {
+  ensureDatabaseReady();
   const { name, email, password } = req.body;
 
   // Input validation
@@ -252,6 +272,7 @@ const registerVendor = asyncHandler(async (req, res) => {
  * @access  Public
  */
 const registerRegularUser = asyncHandler(async (req, res) => {
+  ensureDatabaseReady();
   const { name, email, password } = req.body;
 
   // Input validation

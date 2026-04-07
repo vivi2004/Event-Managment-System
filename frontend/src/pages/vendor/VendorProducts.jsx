@@ -1,10 +1,20 @@
 import { useEffect, useState } from 'react'
 import { vendorAPI } from '../../services/api.js'
 import toast from 'react-hot-toast'
-import { Package, Trash2 } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import BackButton from '../../components/BackButton.jsx'
-import { getProductImage } from '../../utils/productImages.js'
+import { 
+  Package, 
+  PlusCircle, 
+  Trash2, 
+  Edit3, 
+  Search, 
+  Database,
+  Activity,
+  ArrowUpRight,
+  ShieldCheck,
+  ChevronRight
+} from 'lucide-react'
 
 const VendorProducts = () => {
   const [products, setProducts] = useState([])
@@ -15,126 +25,144 @@ const VendorProducts = () => {
   }, [])
 
   const fetchProducts = async () => {
+    setLoading(true)
     try {
       const response = await vendorAPI.getProducts()
       setProducts(response.data.products || [])
     } catch (error) {
-      toast.error('Failed to load products')
+      toast.error('Sync failed')
     } finally {
       setLoading(false)
     }
   }
 
   const handleDelete = async (id) => {
-    if (!confirm('Are you sure you want to delete this product?')) return
+    if (!confirm('Permanently remove item from catalog?')) return
     try {
       await vendorAPI.deleteProduct(id)
-      toast.success('Product deleted successfully')
+      toast.success('Item Purged')
       fetchProducts()
     } catch (error) {
-      toast.error('Failed to delete product')
+      toast.error('Deletion failed')
     }
   }
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
-      </div>
-    )
-  }
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-50">
-      {/* Header Section */}
-      <div className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-emerald-600/90 via-teal-600/90 to-cyan-600/90"></div>
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-          <div className="absolute top-0 left-0">
-            <BackButton className="mb-6" />
+    <div className="page-container">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+        <BackButton />
+        <Link 
+          to="/vendor/add-item" 
+          className="btn-primary flex items-center justify-center gap-2 px-6 py-2.5 text-xs font-black uppercase tracking-[0.15em] shadow-lg shadow-emerald-600/20 bg-emerald-600 border-emerald-600 hover:bg-emerald-700 active:scale-95 transition-all"
+        >
+          <PlusCircle className="w-4 h-4" /> Register New Item
+        </Link>
+      </div>
+
+      <header className="page-header flex items-center gap-4">
+        <div className="p-3 bg-emerald-50 text-emerald-600 rounded-xl">
+           <Package className="w-6 h-6" />
+        </div>
+        <div>
+          <h1 className="page-title">Product Catalog</h1>
+          <p className="page-subtitle uppercase tracking-widest text-[10px] font-bold text-slate-400">Inventory and Product Management</p>
+        </div>
+      </header>
+
+      {loading ? (
+        <div className="p-20 text-center flex flex-col items-center gap-4">
+          <Activity className="w-8 h-8 text-emerald-500 animate-pulse" />
+          <div className="text-[10px] font-mono font-bold text-slate-400 uppercase tracking-widest">Loading Inventory...</div>
+        </div>
+      ) : (
+        <div className="space-y-6">
+          <div className="table-container shadow-xl shadow-slate-200/50">
+            <table className="table">
+              <thead>
+                <tr>
+                  <th>Product Name</th>
+                  <th>Price</th>
+                  <th>Description</th>
+                  <th className="text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {products.map((product) => (
+                  <tr key={product._id} className="group">
+                    <td>
+                       <div className="flex flex-col gap-0.5">
+                         <span className="font-black text-slate-900 uppercase text-sm tracking-tight group-hover:text-emerald-600 transition-colors">
+                           {product.name}
+                         </span>
+                       </div>
+                    </td>
+                    <td>
+                       <span className="px-2 py-1 rounded bg-slate-100 text-slate-900 font-mono text-xs font-black border border-slate-200">
+                         ${product.price.toFixed(2)}
+                       </span>
+                    </td>
+                    <td className="max-w-[200px]">
+                      <p className="text-[10px] text-slate-500 font-medium uppercase leading-tight line-clamp-1 h-3.5">
+                        {product.description}
+                      </p>
+                    </td>
+                    <td className="text-right">
+                      <div className="flex items-center justify-end gap-2 opactiy-0 group-hover:opacity-100 transition-opacity">
+                        <button 
+                          onClick={() => handleDelete(product._id)} 
+                          className="p-2 text-slate-300 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"
+                          title="Purge Item"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            {products.length === 0 && (
+              <div className="p-20 text-center flex flex-col items-center gap-4">
+                <Search className="w-12 h-12 text-slate-200" />
+                <div className="text-sm font-black text-slate-300 uppercase tracking-widest">
+                  Your Catalog is Empty
+                </div>
+              </div>
+            )}
           </div>
           
-          <div className="text-center">
-            <div className="flex justify-center mb-6">
-              <div className="p-3 bg-white/20 backdrop-blur-sm rounded-2xl">
-                <Package className="w-8 h-8 text-white" />
-              </div>
-            </div>
-            <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
-              My Products
-            </h1>
-            <p className="text-xl text-white/90 max-w-2xl mx-auto">
-              Manage your product catalog
-            </p>
-          </div>
-        </div>
-        
-        {/* Decorative Elements */}
-        <div className="absolute bottom-0 left-0 right-0">
-          <svg className="w-full h-16 text-emerald-50" fill="currentColor" viewBox="0 0 1440 100">
-            <path d="M0,64L48,69.3C96,75,192,85,288,80C384,75,480,53,576,48C672,43,768,53,864,58.7C960,64,1056,64,1152,58.7C1248,53,1344,43,1392,37.3L1440,32L1440,100L1392,100C1344,100,1248,100,1152,100C1056,100,960,100,864,100C768,100,672,100,576,100C480,100,384,100,288,100C192,100,96,100,48,100L0,100Z"></path>
-          </svg>
-        </div>
-      </div>
-
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="flex justify-end mb-8">
-          <Link to="/vendor/add-item" className="px-6 py-3 bg-gradient-to-r from-emerald-600 to-teal-600 text-white rounded-lg hover:from-emerald-700 hover:to-teal-700 transition-all duration-200 font-medium flex items-center space-x-2 shadow-lg">
-            <Package className="w-4 h-4" />
-            <span>Add Product</span>
-          </Link>
-        </div>
-
-        {loading ? (
-          <div className="flex items-center justify-center h-64">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600"></div>
-          </div>
-        ) : products.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {products.map((product, index) => (
-              <div key={product._id} className="bg-white rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 overflow-hidden group">
-                <div className="relative h-48">
-                  <img 
-                    src={getProductImage(product.name, index)} 
-                    alt={product.name}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
-                  <div className="absolute top-4 right-4">
-                    <button
-                      onClick={() => handleDelete(product._id)}
-                      className="w-10 h-10 bg-red-500 rounded-lg flex items-center justify-center hover:bg-red-600 transition-colors shadow-lg"
-                    >
-                      <Trash2 className="w-4 h-4 text-white" />
-                    </button>
-                  </div>
-                  <div className="absolute bottom-4 left-4 text-white">
-                    <h3 className="text-xl font-bold">{product.name}</h3>
-                    <p className="text-emerald-300 font-semibold">${product.price}</p>
-                  </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-10">
+             <div className="card border-slate-100 bg-slate-50 shadow-none">
+                <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
+                   <Database className="w-3 h-3" /> Catalog Status
+                </h3>
+                <div className="grid grid-cols-2 gap-4">
+                   <div className="flex flex-col gap-1">
+                      <span className="text-[9px] font-bold text-slate-400 uppercase">Total Items</span>
+                      <span className="text-xl font-black text-slate-900 font-mono">{products.length.toString().padStart(3, '0')}</span>
+                   </div>
+                   <div className="flex flex-col gap-1">
+                      <span className="text-[9px] font-bold text-slate-400 uppercase">Authorization</span>
+                      <div className="flex items-center gap-1.5 text-emerald-600">
+                         <ShieldCheck className="w-3.5 h-3.5" />
+                         <span className="text-[9px] font-black uppercase">VERIFIED</span>
+                      </div>
+                   </div>
                 </div>
-                
-                <div className="p-6">
-                  <p className="text-gray-600 text-sm line-clamp-2">{product.description}</p>
-                  <p className="text-xs text-gray-400 mt-4">
-                    Added: {new Date(product.createdAt).toLocaleDateString()}
-                  </p>
+             </div>
+             
+             <Link to="/vendor/dashboard" className="card border-slate-900 bg-slate-900 text-white flex items-center justify-between group">
+                <div>
+                   <h3 className="text-sm font-black uppercase tracking-tight mb-0.5">Access Dashboard</h3>
+                   <p className="text-[10px] text-slate-400 uppercase font-medium">Return to core analytics</p>
                 </div>
-              </div>
-            ))}
+                <div className="p-2 rounded-lg bg-white/10 group-hover:bg-white/20 transition-all">
+                   <ChevronRight className="w-4 h-4" />
+                </div>
+             </Link>
           </div>
-        ) : (
-          <div className="bg-white rounded-2xl shadow-xl p-12 text-center">
-            <Package className="w-16 h-16 mx-auto text-gray-300 mb-4" />
-            <h3 className="text-xl font-bold text-gray-900 mb-2">No products yet</h3>
-            <p className="text-gray-500 mb-6">Start by adding your first product</p>
-            <Link to="/vendor/add-item" className="px-6 py-3 bg-gradient-to-r from-emerald-600 to-teal-600 text-white rounded-lg hover:from-emerald-700 hover:to-teal-700 transition-all duration-200 font-medium inline-flex items-center space-x-2 shadow-lg">
-              <Package className="w-4 h-4" />
-              <span>Add Product</span>
-            </Link>
-          </div>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   )
 }

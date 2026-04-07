@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { userAPI } from '../../services/api.js'
 import toast from 'react-hot-toast'
-import { Package, Send, Store } from 'lucide-react'
+import BackButton from '../../components/BackButton.jsx'
 
 const RequestItem = () => {
   const [vendors, setVendors] = useState([])
@@ -24,7 +24,7 @@ const RequestItem = () => {
       const response = await userAPI.getVendors()
       setVendors(response.data.vendors || [])
     } catch (error) {
-      toast.error('Failed to load vendors')
+      toast.error('Sync failed')
     } finally {
       setFetchingVendors(false)
     }
@@ -34,12 +34,11 @@ const RequestItem = () => {
     e.preventDefault()
 
     if (!formData.vendorId || !formData.productName || !formData.description) {
-      toast.error('Please fill in all required fields')
+      toast.error('All fields mandatory')
       return
     }
 
     setLoading(true)
-
     try {
       await userAPI.requestProduct({
         vendorId: formData.vendorId,
@@ -49,7 +48,7 @@ const RequestItem = () => {
         quantity: parseInt(formData.quantity) || 1,
       })
       
-      toast.success('Product request sent successfully!')
+      toast.success('Inquiry Logged')
       setFormData({
         vendorId: '',
         productName: '',
@@ -58,104 +57,106 @@ const RequestItem = () => {
         quantity: 1,
       })
     } catch (error) {
-      toast.error(error.response?.data?.message || 'Failed to send request')
+      toast.error(error.response?.data?.message || 'Inquiry failed')
     } finally {
       setLoading(false)
     }
   }
 
   return (
-    <div className="max-w-2xl mx-auto">
-      <div className="flex items-center space-x-3 mb-6">
-        <Package className="w-8 h-8 text-purple-600" />
-        <div>
-          <h1 className="text-2xl font-bold">Request Custom Item</h1>
-          <p className="text-gray-600">Request a specific product from a vendor</p>
-        </div>
+    <div className="page-container max-w-2xl">
+      <div className="mb-6">
+        <BackButton />
       </div>
+
+      <header className="page-header">
+        <h1 className="page-title">CUSTOM_INQUIRY_PROTOCOL</h1>
+        <p className="page-subtitle">Initialize a special request for a specific vendor unit</p>
+      </header>
 
       <div className="card">
         <form onSubmit={handleSubmit} className="space-y-6">
-          <div>
-            <label className="form-label flex items-center space-x-2">
-              <Store className="w-4 h-4" />
-              <span>Select Vendor *</span>
-            </label>
+          <div className="form-group">
+            <label className="form-label">Target Vendor (Select)</label>
             {fetchingVendors ? (
-              <div className="animate-pulse h-10 bg-gray-200 rounded-lg"></div>
+              <div className="animate-pulse h-10 bg-slate-100 rounded"></div>
             ) : (
               <select
                 value={formData.vendorId}
                 onChange={(e) => setFormData({ ...formData, vendorId: e.target.value })}
-                className="input"
+                className="input text-xs font-bold"
                 required
               >
-                <option value="">Choose a vendor...</option>
+                <option value="">-- SELECT_AUTHORIZED_VENDOR --</option>
                 {vendors.map((vendor) => (
                   <option key={vendor._id} value={vendor._id}>
-                    {vendor.name}
+                    {vendor.name.toUpperCase()}
                   </option>
                 ))}
               </select>
             )}
           </div>
 
-          <div>
-            <label className="form-label">Product Name *</label>
+          <div className="form-group">
+            <label className="form-label">Item Designation (Name)</label>
             <input
               type="text"
               value={formData.productName}
               onChange={(e) => setFormData({ ...formData, productName: e.target.value })}
               className="input"
-              placeholder="What product are you looking for?"
+              placeholder="E.G. CUSTOM_STAGING_UNIT"
               required
             />
           </div>
 
-          <div>
-            <label className="form-label">Description *</label>
+          <div className="form-group">
+            <label className="form-label">Technical Specification (Description)</label>
             <textarea
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              className="input h-32 resize-none"
-              placeholder="Describe the product in detail (specifications, color, size, etc.)"
+              className="input h-32 resize-none text-xs"
+              placeholder="DESCRIBE_REQUEST_PARAMETERS_AND_TERMS..."
               required
             />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="form-label">Expected Price ($)</label>
+            <div className="form-group">
+              <label className="form-label">Expected Valuation (USD)</label>
               <input
                 type="number"
                 step="0.01"
                 min="0"
                 value={formData.expectedPrice}
                 onChange={(e) => setFormData({ ...formData, expectedPrice: e.target.value })}
-                className="input"
+                className="input font-mono"
                 placeholder="0.00"
               />
             </div>
-            <div>
-              <label className="form-label">Quantity</label>
+            <div className="form-group">
+              <label className="form-label">Unit Quantity</label>
               <input
                 type="number"
                 min="1"
                 value={formData.quantity}
                 onChange={(e) => setFormData({ ...formData, quantity: e.target.value })}
-                className="input"
+                className="input font-mono"
                 required
               />
             </div>
           </div>
 
+          <div className="p-3 bg-slate-50 border border-slate-100 rounded text-[9px] text-slate-400 uppercase tracking-widest leading-relaxed">
+            SYSTEM_LOG: Custom inquiries are transmitted directly to the vendor buffer. 
+            Approval is subject to vendor-side capacity validation.
+          </div>
+
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors disabled:opacity-50 flex items-center justify-center space-x-2"
+            className="btn-primary w-full py-3 text-xs font-bold uppercase tracking-widest"
           >
-            <Send className="w-4 h-4" />
-            <span>{loading ? 'Sending...' : 'Send Request'}</span>
+            {loading ? 'TRANSMITTING_STREAMS...' : 'INITIALIZE_REQUEST'}
           </button>
         </form>
       </div>
