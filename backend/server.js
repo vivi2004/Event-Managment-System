@@ -26,34 +26,20 @@ import userRoutes from './routes/userRoutes.js';
 dotenv.config();
 
 // Connect to DB
+// We will mock this temporarily if mongoose is not installed yet but since we will npm install, we keep it.
 connectDB();
 
 const app = express();
 
-// CORS Configuration
-const corsOptions = {
-  origin: process.env.FRONTEND_URL 
-    ? [process.env.FRONTEND_URL, 'http://localhost:5175', 'http://localhost:3000']
-    : '*',
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
-};
-
-// Middleware
-app.use(cors(corsOptions));
+// Body parser
 app.use(express.json());
+app.use(cors());
 
-// Health check endpoint
 app.get('/', (req, res) => {
-  res.json({
-    message: 'Event Management System API is running',
-    status: 'online',
-    timestamp: new Date().toISOString()
-  });
+  res.send('API is running...');
 });
 
-// API Routes
+// Using routes
 app.use('/api/auth', authRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/vendor', vendorRoutes);
@@ -65,6 +51,10 @@ app.use(errorHandler);
 
 const PORT = process.env.PORT || 5000;
 
-app.listen(PORT, () => {
-  console.log(`Server running in ${process.env.NODE_ENV} mode on port ${PORT}`);
-});
+if (process.env.NODE_ENV !== 'production') {
+  app.listen(PORT, () => {
+    console.log(`Server running in ${process.env.NODE_ENV} mode on port ${PORT}`);
+  });
+}
+
+export default app;

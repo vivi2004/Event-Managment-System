@@ -1,6 +1,7 @@
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { useAuth } from './context/AuthContext.jsx'
 import Navbar from './components/Navbar.jsx'
+import Footer from './components/Footer.jsx'
 
 // Auth Pages
 import Index from './pages/Index.jsx'
@@ -65,7 +66,7 @@ function App() {
   return (
     <div className="min-h-screen bg-gray-50">
       <Navbar />
-      <main className="container mx-auto px-4 py-8">
+      <main>
         <Routes>
           {/* Public Routes */}
           <Route path="/" element={<Index />} />
@@ -238,6 +239,7 @@ function App() {
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </main>
+      <Footer />
     </div>
   )
 }

@@ -15,7 +15,7 @@ const BackButton = ({ to = -1, className = '' }) => {
   return (
     <button
       onClick={handleBack}
-      className={`flex items-center space-x-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 px-3 py-2 rounded-lg transition-all duration-200 ${className}`}
+      className={`inline-flex items-center space-x-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 px-4 py-2 rounded-lg transition-all duration-200 shadow-sm hover:shadow-md ${className}`}
     >
       <ArrowLeft className="w-4 h-4" />
       <span className="text-sm font-medium">Back</span>

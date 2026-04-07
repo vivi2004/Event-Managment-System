@@ -45,7 +45,9 @@ const AdminLogin = () => {
       </div>
 
       <div className="relative w-full max-w-md">
-        <BackButton className="mb-6" />
+        <div className="absolute top-0 left-0">
+          <BackButton className="mb-6" />
+        </div>
         
         <div className="bg-white/10 backdrop-blur-xl rounded-2xl shadow-2xl p-8 border border-white/20">
           {/* Header */}

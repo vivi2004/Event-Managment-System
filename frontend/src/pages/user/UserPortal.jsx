@@ -52,7 +52,9 @@ const UserPortal = () => {
       <div className="relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-purple-600/90 via-pink-600/90 to-blue-600/90"></div>
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-          <BackButton className="mb-6" />
+          <div className="absolute top-0 left-0">
+            <BackButton className="mb-6" />
+          </div>
           
           <div className="text-center">
             <div className="flex justify-center mb-6">

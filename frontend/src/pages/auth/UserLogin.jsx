@@ -4,6 +4,7 @@ import { useAuth } from '../../context/AuthContext.jsx'
 import { authAPI } from '../../services/api.js'
 import toast from 'react-hot-toast'
 import { User, Eye, EyeOff } from 'lucide-react'
+import BackButton from '../../components/BackButton.jsx'
 
 const UserLogin = () => {
   const [email, setEmail] = useState('')
@@ -38,7 +39,10 @@ const UserLogin = () => {
   }
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center">
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 flex items-center justify-center p-4">
+      <div className="absolute top-4 left-4">
+        <BackButton />
+      </div>
       <div className="card w-full max-w-md">
         <div className="text-center mb-6">
           <div className="flex items-center justify-center w-16 h-16 bg-purple-100 rounded-full mb-4 mx-auto">

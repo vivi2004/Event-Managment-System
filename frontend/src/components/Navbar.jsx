@@ -1,6 +1,6 @@
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext.jsx'
-import { UserCircle, LogOut, Menu, X } from 'lucide-react'
+import { UserCircle, LogOut, Menu, X, Sparkles, ShoppingCart, Package, Users } from 'lucide-react'
 import { useState } from 'react'
 
 const Navbar = () => {
@@ -29,33 +29,31 @@ const Navbar = () => {
 
   const getNavLinks = () => {
     if (!user) {
-      return [
-        { to: '/', label: 'Home' },
-      ]
+      return []
     }
 
     switch (user.role) {
       case 'admin':
         return [
-          { to: '/admin/dashboard', label: 'Dashboard' },
-          { to: '/admin/maintain-user', label: 'Users' },
-          { to: '/admin/maintain-vendor', label: 'Vendors' },
-          { to: '/admin/add-membership', label: 'Add Membership' },
+          { to: '/admin/dashboard', label: 'Dashboard', icon: null },
+          { to: '/admin/maintain-user', label: 'Users', icon: Users },
+          { to: '/admin/maintain-vendor', label: 'Vendors', icon: Package },
+          { to: '/admin/add-membership', label: 'Membership', icon: null },
         ]
       case 'vendor':
         return [
-          { to: '/vendor/dashboard', label: 'Dashboard' },
-          { to: '/vendor/add-item', label: 'Add Item' },
-          { to: '/vendor/products', label: 'Products' },
-          { to: '/vendor/transactions', label: 'Transactions' },
+          { to: '/vendor/dashboard', label: 'Dashboard', icon: null },
+          { to: '/vendor/add-item', label: 'Add Item', icon: null },
+          { to: '/vendor/products', label: 'Products', icon: Package },
+          { to: '/vendor/transactions', label: 'Transactions', icon: null },
         ]
       case 'user':
         return [
-          { to: '/user/portal', label: 'Portal' },
-          { to: '/user/vendors', label: 'Vendors' },
-          { to: '/user/cart', label: 'Cart' },
-          { to: '/user/guest-list', label: 'Guest List' },
-          { to: '/user/order-status', label: 'Orders' },
+          { to: '/user/portal', label: 'Portal', icon: null },
+          { to: '/user/vendors', label: 'Vendors', icon: Package },
+          { to: '/user/cart', label: 'Cart', icon: ShoppingCart },
+          { to: '/user/guest-list', label: 'Guest List', icon: Users },
+          { to: '/user/order-status', label: 'Orders', icon: null },
         ]
       default:
         return []
@@ -63,47 +61,53 @@ const Navbar = () => {
   }
 
   return (
-    <nav className="bg-primary-600 text-white shadow-lg">
-      <div className="container mx-auto px-4">
+    <nav className="bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 text-white shadow-xl sticky top-0 z-50 backdrop-blur-lg">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link to={getDashboardLink()} className="text-xl font-bold">
-            Event Management
+          <Link to={getDashboardLink()} className="flex items-center space-x-2 group">
+            <div className="p-2 bg-white/20 rounded-lg backdrop-blur-sm group-hover:bg-white/30 transition-all duration-200">
+              <Sparkles className="w-5 h-5 text-white" />
+            </div>
+            <span className="text-xl font-bold hidden sm:block">Event Management</span>
+            <span className="text-lg font-bold sm:hidden">EM</span>
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-4">
+          <div className="hidden xl:flex items-center space-x-1">
             {getNavLinks().map((link) => (
               <Link
                 key={link.to}
                 to={link.to}
-                className="px-3 py-2 rounded-md hover:bg-primary-700 transition-colors"
+                className="flex items-center space-x-2 px-4 py-2 rounded-lg hover:bg-white/20 transition-all duration-200 text-sm font-medium"
               >
-                {link.label}
+                {link.icon && <link.icon className="w-4 h-4" />}
+                <span>{link.label}</span>
               </Link>
             ))}
           </div>
 
           {/* User Section */}
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-2 sm:space-x-3">
             {user ? (
               <>
-                <div className="flex items-center space-x-2">
-                  <UserCircle className="w-6 h-6" />
-                  <span className="hidden md:inline">{user.name}</span>
+                <div className="hidden sm:flex items-center space-x-2 px-3 py-2 bg-white/10 rounded-lg backdrop-blur-sm">
+                  <UserCircle className="w-5 h-5 text-white/80" />
+                  <span className="text-sm font-medium hidden lg:block">{user.name}</span>
+                  <span className="text-xs text-white/60 capitalize">({user.role})</span>
                 </div>
                 <button
                   onClick={handleLogout}
-                  className="flex items-center space-x-1 px-3 py-2 rounded-md hover:bg-primary-700 transition-colors"
+                  className="flex items-center space-x-2 px-3 sm:px-4 py-2 bg-white/20 rounded-lg hover:bg-white/30 transition-all duration-200 backdrop-blur-sm"
                 >
                   <LogOut className="w-4 h-4" />
-                  <span className="hidden md:inline">Logout</span>
+                  <span className="hidden sm:inline text-sm font-medium">Logout</span>
                 </button>
               </>
             ) : (
               <Link
                 to="/"
-                className="px-4 py-2 bg-white text-primary-600 rounded-md font-medium hover:bg-gray-100 transition-colors"
+                className="px-3 sm:px-4 py-2 bg-white text-purple-600 rounded-lg font-medium hover:bg-purple-50 transition-all duration-200 shadow-lg hover:shadow-xl text-sm"
               >
                 Login
               </Link>
@@ -112,25 +116,35 @@ const Navbar = () => {
             {/* Mobile Menu Button */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="md:hidden p-2 rounded-md hover:bg-primary-700 transition-colors"
+              className="xl:hidden p-2 rounded-lg hover:bg-white/20 transition-all duration-200"
             >
-              {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+              {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
           </div>
         </div>
 
         {/* Mobile Menu */}
         {mobileMenuOpen && (
-          <div className="md:hidden py-4 border-t border-primary-500">
-            <div className="flex flex-col space-y-2">
+          <div className="xl:hidden py-4 border-t border-white/20">
+            <div className="flex flex-col space-y-1">
+              {user && (
+                <div className="flex items-center space-x-2 px-4 py-2 bg-white/10 rounded-lg mb-2">
+                  <UserCircle className="w-5 h-5 text-white/80" />
+                  <div>
+                    <span className="text-sm font-medium block">{user.name}</span>
+                    <span className="text-xs text-white/60 capitalize">({user.role})</span>
+                  </div>
+                </div>
+              )}
               {getNavLinks().map((link) => (
                 <Link
                   key={link.to}
                   to={link.to}
                   onClick={() => setMobileMenuOpen(false)}
-                  className="px-3 py-2 rounded-md hover:bg-primary-700 transition-colors"
+                  className="flex items-center space-x-2 px-4 py-2 rounded-lg hover:bg-white/20 transition-all duration-200"
                 >
-                  {link.label}
+                  {link.icon && <link.icon className="w-4 h-4" />}
+                  <span>{link.label}</span>
                 </Link>
               ))}
             </div>
