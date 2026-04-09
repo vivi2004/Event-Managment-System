@@ -21,7 +21,6 @@ const membershipSchema = mongoose.Schema(
     },
     endDate: {
       type: Date,
-      required: true,
     },
     status: {
       type: String,
@@ -53,3 +52,7 @@ membershipSchema.pre('save', function (next) {
 const Membership = mongoose.model('Membership', membershipSchema);
 
 export default Membership;
+
+
+
+

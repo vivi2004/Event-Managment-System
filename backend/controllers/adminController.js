@@ -105,16 +105,22 @@ const addMembership = asyncHandler(async (req, res) => {
   // Validate and set duration
   const membershipDuration = VALID_DURATIONS.includes(duration) ? duration : '6 months';
 
-  const membership = await Membership.create({
-    vendorId,
-    duration: membershipDuration,
-  });
+  try {
+    const membership = await Membership.create({
+      vendorId,
+      duration: membershipDuration,
+    });
 
-  res.status(201).json({
-    success: true,
-    message: 'Membership created successfully',
-    membership,
-  });
+    res.status(201).json({
+      success: true,
+      message: 'Membership created successfully',
+      membership,
+    });
+  } catch (error) {
+    console.error('Database Error in addMembership:', error);
+    res.status(500);
+    throw new Error(`Execution error: ${error.message}`);
+  }
 });
 
 /**

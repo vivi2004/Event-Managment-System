@@ -8,10 +8,9 @@ import {
   Plus, 
   Minus, 
   CreditCard, 
-  ShieldCheck, 
-  Info, 
   ChevronRight,
-  Package
+  Package,
+  Store
 } from 'lucide-react'
 
 const Cart = () => {
